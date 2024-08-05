@@ -2,7 +2,7 @@
 """module: function: wait_n
 """
 import asyncio
-from types import List
+from typing import List
 
 wait_random = __import__('0-basic_async_syntax').wait_random
 
