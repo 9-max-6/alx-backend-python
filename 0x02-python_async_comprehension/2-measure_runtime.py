@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-
-async_comprehension = __import__('1-async_comprehension').async_comprehension
+"""module: coroutine: measure_runtime
+"""
 import asyncio
 import time
+async_comprehension = __import__('1-async_comprehension').async_comprehension
 
 
 async def measure_runtime() -> float:
@@ -10,11 +11,12 @@ async def measure_runtime() -> float:
     all async_comprehension() tasks
     """
     now = time.perf_counter()
-    await asyncio.gather(async_comprehension(),
-                   async_comprehension(),
-                   async_comprehension(),
-                   async_comprehension()
-                   )
+    await asyncio.gather(
+        async_comprehension(),
+        async_comprehension(),
+        async_comprehension(),
+        async_comprehension()
+        )
     after = time.perf_counter()
 
     return after - now
