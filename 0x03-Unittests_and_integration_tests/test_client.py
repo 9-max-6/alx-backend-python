@@ -2,7 +2,7 @@
 """testsuite"""
 import unittest
 import client
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 from parameterized import parameterized
 from typing import Dict
 from client import GithubOrgClient
@@ -25,3 +25,16 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(client.org(), resp)
         expected_arg = f"https://api.github.com/orgs/{org}"
         mock_get_json.assert_called_once_with(expected_arg)
+
+    def test_public_repos_url(self):
+        """a method to test GithubOrgClient._public_repos_url property."""
+
+        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock:
+            TEST_PAYLOAD = {
+                "repos_url": "https://api.github.com/orgs/google/repos"
+                }
+            mock.return_value = TEST_PAYLOAD
+            self.assertEqual(
+                GithubOrgClient("google")._public_repos_url,
+                TEST_PAYLOAD.get("repos_url")
+                )
