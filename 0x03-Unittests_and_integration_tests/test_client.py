@@ -109,16 +109,15 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
                 return cls.repos_payload
             else:
                 return
-        
+
         module = "requests.get"
         cls.get_patcher = patch(module, side_effect=fetch_payload)
         cls.get_patcher.start()
-    
+
     @classmethod
     def tearDownClass(cls) -> None:
         """Stop the patcher"""
         cls.get_patcher.stop()
-    
 
     def test_public_repos(self) -> None:
         """Tests the `public_repos` method."""
