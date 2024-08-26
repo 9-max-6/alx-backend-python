@@ -2,7 +2,7 @@
 """testsuite"""
 import unittest
 from unittest.mock import patch, MagicMock, PropertyMock
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 from typing import Dict, List
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
@@ -69,5 +69,67 @@ class TestGithubOrgClient(unittest.TestCase):
     def test_has_license(self, lic: Dict, lic_key: str, exp: bool) -> None:
         """A function to test has_license"""
         resp = GithubOrgClient.has_license(lic, lic_key)
-    
+
         self.assertEqual(resp, exp)
+
+
+@parameterized_class([
+    {
+        'org_payload': TEST_PAYLOAD[0][0],
+        'repos_payload': TEST_PAYLOAD[0][1],
+        'expected_repos': TEST_PAYLOAD[0][2],
+        'apache2_repos': TEST_PAYLOAD[0][3],
+    },
+])
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """
+    Use @parameterized_class to decorate the class and parameterize it
+    with fixtures found in fixtures.py. The file contains
+    the following fixtures:
+    org_payload,
+    repos_payload,
+    expected_repos,
+    apache2_repos
+    The setupClass should mock requests.get to
+    return example payloads found in the fixtures.
+    Use patch to start a patcher named get_patcher,
+    and use side_effect to make sure the mock of requests.get(url).json()
+    returns the correct fixtures for the various values of url that
+    you anticipate to receive.
+    Implement the tearDownClass class method to stop the patcher.
+    """
+    @classmethod
+    def setUpClass(cls) -> None:
+        """Start the patcher"""
+        def fetch_payload(url):
+            """Side effect"""
+            if url == 'https://api.github.com/orgs/google':
+                return cls.org_payload
+            elif url == 'https://api.github.com/google/repos':
+                return cls.repos_payload
+            else:
+                return
+        
+        module = "requests.get"
+        cls.get_patcher = patch(module, side_effect=fetch_payload)
+        cls.get_patcher.start()
+    
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """Stop the patcher"""
+        cls.get_patcher.stop()
+    
+
+    def test_public_repos(self) -> None:
+        """Tests the `public_repos` method."""
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(),
+            self.expected_repos,
+        )
+
+    def test_public_repos_with_license(self) -> None:
+        """Tests the `public_repos` method with a license."""
+        self.assertEqual(
+            GithubOrgClient("google").public_repos(license="apache-2.0"),
+            self.apache2_repos,
+        )
