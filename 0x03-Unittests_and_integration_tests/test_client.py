@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch, MagicMock, PropertyMock
 from parameterized import parameterized
-from typing import Dict
+from typing import Dict, List
 from client import GithubOrgClient
 from fixtures import TEST_PAYLOAD
 
@@ -40,7 +40,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 )
 
     @patch('client.get_json')
-    def test_public_repos(self, mock_get_json) -> None:
+    def test_public_repos(self, mock_get_json: MagicMock) -> None:
         """A function to test the publick repos function of the GithubOrgClient
         steps
         1. Mock get json. make it return a payload
@@ -61,3 +61,13 @@ class TestGithubOrgClient(unittest.TestCase):
             mock.assert_called_once()
 
         mock_get_json.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)
+        ])
+    def test_has_license(self, lic: Dict, lic_key: str, exp: bool) -> None:
+        """A function to test has_license"""
+        resp = GithubOrgClient.has_license(lic, lic_key)
+    
+        self.assertEqual(resp, exp)
