@@ -37,7 +37,7 @@ class TestGetJson(unittest.TestCase):
         ("http://holberton.io", {"payload": False}),
     ])
     @unittest.mock.patch('utils.get_json')
-    def test_get_json(self, test_url, test_payload, mock_get_json):
+    def test_get_json(self, mock_get_json, test_url, test_payload):
         """A function to implement the test logic
         steps
         1. Make a mock object
