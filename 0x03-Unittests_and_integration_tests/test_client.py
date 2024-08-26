@@ -28,8 +28,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
     def test_public_repos_url(self):
         """a method to test GithubOrgClient._public_repos_url property."""
-
-        with patch("client.GithubOrgClient.org", new_callable=PropertyMock) as mock:
+        module = "client.GithubOrgClient.org"
+        with patch(module, new_callable=PropertyMock) as mock:
             TEST_PAYLOAD = {
                 "repos_url": "https://api.github.com/orgs/google/repos"
                 }
