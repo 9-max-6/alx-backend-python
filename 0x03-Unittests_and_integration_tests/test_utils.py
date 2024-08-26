@@ -57,7 +57,7 @@ class TestGetJson(unittest.TestCase):
 class TestMemoize(unittest.TestCase):
     """A class to implement the memoization function in utils.py"""
 
-    def test_memoize(self):
+    def test_memoize(self) -> None:
         """a function to implement the actual test"""
         class TestClass:
             def a_method(self):
@@ -67,7 +67,7 @@ class TestMemoize(unittest.TestCase):
             def a_property(self):
                 return self.a_method()
 
-        with patch.object(TestClass, 'a_method', return_value=42) as m:
+        with patch.object(TestClass, 'a_method', return_value=lambda: 42) as m:
             test = TestClass()
             first_resp = test.a_property()
             sec_resp = test.a_property()
