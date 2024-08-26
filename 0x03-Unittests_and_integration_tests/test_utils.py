@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """module: test suite"""
 import unittest
-import utils
+import requests
+from unittest.mock import patch
 from parameterized import parameterized
-from utils import access_nested_map
+from utils import access_nested_map, get_json
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -36,25 +37,18 @@ class TestGetJson(unittest.TestCase):
         ("http://example.com", {"payload": True}),
         ("http://holberton.io", {"payload": False}),
     ])
-    @unittest.mock.patch('utils.get_json')
-    def test_get_json(self, mock_get_json, test_url, test_payload):
+    def test_get_json(self, test_url, test_payload):
         """A function to implement the test logic
         steps
-        1. Make a mock object
-        2. Create a method called json of the mock object
+        1. Create a context manager using patch
+        2. The object in the context manager should be
+            a Mock object that has a method that returns
+            test_payload
         3. Set the return value of the method to be the test_payload
         4. Set the return value of the mocked method to be the mock object.
         """
         mock = unittest.mock.Mock()
         mock.json.return_value = test_payload
-        # print(f"\n\n\n{mock_get_json}\n\n\n")
-        # print(f"\n\n\n{test_url}\n\n\n")
-        # print(f"\n\n\n{test_payload}\n\n\n")
-        mock_get_json.return_value = mock
-
-        # Action
-        response = mock_get_json(test_url)
-
-        # Tests
-        mock_get_json.assert_called_once_with(test_url)
-        self.assertEqual(response, mock)
+        with patch('requests.get', return_value=mock) as m:
+            self.assertEqual(get_json(test_url), test_payload)
+            m.assert_called_once_with(test_url)
